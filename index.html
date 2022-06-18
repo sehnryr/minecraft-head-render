@@ -34,6 +34,10 @@
 					<label for="body">Body</label>
 					<input id="body" type="checkbox" checked />
 				</div>
+				<div>
+					<label for="slim">Slim</label>
+					<input id="slim" type="checkbox" />
+				</div>
 			</div>
 		</div>
 		<script defer>
@@ -50,12 +54,20 @@
 				skinRender.toggleSkinPart("rightTrousers", toogle)
 				skinRender.toggleSkinPart("body", toogle)
 				skinRender.toggleSkinPart("jacket", toogle)
+
+				skinRender.playerModel.rotation.y = angle
 			}
 
 			var r = 30
 			var a = (-24 * Math.PI) / 180
 			var x = r * Math.sin(a)
 			var z = r * Math.cos(a)
+
+			var angle = 0
+
+			var texture = {
+				username: location.hash ? location.hash.substring(1) : "inventivetalent",
+			}
 
 			var skinRender = new SkinRender(
 				{
@@ -80,25 +92,20 @@
 				},
 				document.body
 			)
-			skinRender.render(
-				{
-					username: location.hash ? location.hash.substring(1) : "inventivetalent",
-				},
-				callback
-			)
+			skinRender.render(texture, callback)
 
 			var nameInput = () => {
 				var skin = $("#nameInput").val()
 				console.log(skin.indexOf("http") === 0)
-				var options = {}
 				if (skin.indexOf("http") === 0) {
-					options.url = skin
+					texture.url = skin
 				} else {
-					options.username = skin
+					texture.username = skin
 					location.hash = skin
 				}
+				delete texture.data
 				skinRender.clearScene()
-				skinRender.render(options, callback)
+				skinRender.render(texture, callback)
 			}
 
 			if (location.hash) $("#nameInput").val(location.hash.substring(1))
@@ -111,11 +118,12 @@
 			var dataInput = () => {
 				var data = $("#dataInput").val()
 				if (data.length > 0) {
-					var options = {}
-					options.data = data
+					texture.data = data
+					delete texture.url
+					delete texture.username
 
 					skinRender.clearScene()
-					skinRender.render(options, callback)
+					skinRender.render(texture, callback)
 				}
 			}
 
@@ -126,12 +134,18 @@
 			})
 
 			$("#angleInput").on("input", (e) => {
-				var angle = $("#angleInput").val()
-				angle = (parseInt(angle) * Math.PI) / 180
+				angle = (parseInt($("#angleInput").val()) * Math.PI) / 180
 				skinRender.playerModel.rotation.y = angle
 			})
 
 			$("#body").on("change", callback)
+
+			$("#slim").on("change", () => {
+				var slim = $("#slim").is(":checked")
+				texture.slim = slim
+				skinRender.clearScene()
+				skinRender.render(texture, callback)
+			})
 		</script>
 	</body>
 </html>
