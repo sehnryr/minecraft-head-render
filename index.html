@@ -30,26 +30,26 @@
 					<label for="angleInput">Angle</label>
 					<input id="angleInput" type="range" min="-180" max="180" value="-24" />
 				</div>
+				<div>
+					<label for="body">Body</label>
+					<input id="body" type="checkbox" checked />
+				</div>
 			</div>
 		</div>
 		<script defer>
 			var callback = () => {
-				skinRender.toggleSkinPart("leftArm", false)
-				skinRender.toggleSkinPart("leftSleeve", false)
+				var toogle = $("#body").is(":checked")
 
-				skinRender.toggleSkinPart("rightArm", false)
-				skinRender.toggleSkinPart("rightSleeve", false)
-
-				skinRender.toggleSkinPart("leftLeg", false)
-				skinRender.toggleSkinPart("leftTrousers", false)
-
-				skinRender.toggleSkinPart("rightLeg", false)
-				skinRender.toggleSkinPart("rightTrousers", false)
-
-				skinRender.toggleSkinPart("body", false)
-				skinRender.toggleSkinPart("jacket", false)
-
-				console.log(skinRender)
+				skinRender.toggleSkinPart("leftArm", toogle)
+				skinRender.toggleSkinPart("leftSleeve", toogle)
+				skinRender.toggleSkinPart("rightArm", toogle)
+				skinRender.toggleSkinPart("rightSleeve", toogle)
+				skinRender.toggleSkinPart("leftLeg", toogle)
+				skinRender.toggleSkinPart("leftTrousers", toogle)
+				skinRender.toggleSkinPart("rightLeg", toogle)
+				skinRender.toggleSkinPart("rightTrousers", toogle)
+				skinRender.toggleSkinPart("body", toogle)
+				skinRender.toggleSkinPart("jacket", toogle)
 			}
 
 			var r = 30
@@ -102,7 +102,6 @@
 			}
 
 			if (location.hash) $("#nameInput").val(location.hash.substring(1))
-			$("#nameInput").on("change", nameInput)
 			$("#nameInput").on("keypress", (e) => {
 				if (e.keyCode === 13) {
 					nameInput()
@@ -120,7 +119,6 @@
 				}
 			}
 
-			$("#dataInput").on("change", dataInput)
 			$("#dataInput").on("keypress", (e) => {
 				if (e.keyCode === 13) {
 					dataInput()
@@ -130,8 +128,10 @@
 			$("#angleInput").on("input", (e) => {
 				var angle = $("#angleInput").val()
 				angle = (parseInt(angle) * Math.PI) / 180
-				skinRender.playerModel.children[0].rotation.y = angle
+				skinRender.playerModel.rotation.y = angle
 			})
+
+			$("#body").on("change", callback)
 		</script>
 	</body>
 </html>
