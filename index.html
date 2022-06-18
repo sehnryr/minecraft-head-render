@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Minecraft head renderer</title>
+		<link id="favicon" rel="icon" href="https://minerender.org/favicon.ico" />
+		<script
+			src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"
+			integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+			crossorigin="anonymous"
+		></script>
+		<script
+			src="https://cdnjs.cloudflare.com/ajax/libs/three.js/94/three.min.js"
+			integrity="sha256-NGC9JEuTWN4GhTj091wctgjzftr+8WNDmw0H8J5YPYE="
+			crossorigin="anonymous"
+		></script>
+		<script src="https://cdn.jsdelivr.net/gh/InventivetalentDev/MineRender@1.4.6/dist/skin.min.js"></script>
+	</head>
+	<body>
+		<div>
+			<div style="margin: 10px">
+				<div>
+					<label for="nameInput">Username or URL</label>
+					<input type="text" id="nameInput" placeholder="URL or Username" value="inventivetalent" />
+				</div>
+				<div>
+					<label for="dataInput">Image data</label>
+					<input type="text" id="dataInput" placeholder="Image data in base64" value="" />
+				</div>
+				<div>
+					<label for="angleInput">Angle</label>
+					<input id="angleInput" type="range" min="-180" max="180" value="-24" />
+				</div>
+			</div>
+		</div>
+		<script defer>
+			var callback = () => {
+				skinRender.toggleSkinPart("leftArm", false)
+				skinRender.toggleSkinPart("leftSleeve", false)
+
+				skinRender.toggleSkinPart("rightArm", false)
+				skinRender.toggleSkinPart("rightSleeve", false)
+
+				skinRender.toggleSkinPart("leftLeg", false)
+				skinRender.toggleSkinPart("leftTrousers", false)
+
+				skinRender.toggleSkinPart("rightLeg", false)
+				skinRender.toggleSkinPart("rightTrousers", false)
+
+				skinRender.toggleSkinPart("body", false)
+				skinRender.toggleSkinPart("jacket", false)
+
+				console.log(skinRender)
+			}
+
+			var r = 30
+			var a = (-24 * Math.PI) / 180
+			var x = r * Math.sin(a)
+			var z = r * Math.cos(a)
+
+			var skinRender = new SkinRender(
+				{
+					controls: {
+						enabled: false,
+						zoom: false,
+						rotate: false,
+						pan: false,
+					},
+					camera: {
+						type: "perspective",
+						x: x,
+						y: 34,
+						z: z,
+						target: [0, 27, 0],
+						zoom: 2.5,
+					},
+					canvas: {
+						width: 256,
+						height: 256,
+					},
+				},
+				document.body
+			)
+			skinRender.render(
+				{
+					username: location.hash ? location.hash.substring(1) : "inventivetalent",
+				},
+				callback
+			)
+
+			var nameInput = () => {
+				var skin = $("#nameInput").val()
+				console.log(skin.indexOf("http") === 0)
+				var options = {}
+				if (skin.indexOf("http") === 0) {
+					options.url = skin
+				} else {
+					options.username = skin
+					location.hash = skin
+				}
+				skinRender.clearScene()
+				skinRender.render(options, callback)
+			}
+
+			if (location.hash) $("#nameInput").val(location.hash.substring(1))
+			$("#nameInput").on("change", nameInput)
+			$("#nameInput").on("keypress", (e) => {
+				if (e.keyCode === 13) {
+					nameInput()
+				}
+			})
+
+			var dataInput = () => {
+				var data = $("#dataInput").val()
+				if (data.length > 0) {
+					var options = {}
+					options.data = data
+
+					skinRender.clearScene()
+					skinRender.render(options, callback)
+				}
+			}
+
+			$("#dataInput").on("change", dataInput)
+			$("#dataInput").on("keypress", (e) => {
+				if (e.keyCode === 13) {
+					dataInput()
+				}
+			})
+
+			$("#angleInput").on("input", (e) => {
+				var angle = $("#angleInput").val()
+				angle = (parseInt(angle) * Math.PI) / 180
+				skinRender.playerModel.children[0].rotation.y = angle
+			})
+		</script>
+	</body>
+</html>
